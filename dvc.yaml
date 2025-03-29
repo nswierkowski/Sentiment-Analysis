@@ -1,0 +1,31 @@
+stages:
+  raw_data_processing:
+    cmd: python scripts/raw_data_processing.py ./data/raw ./data/processed/reviews.csv
+    deps:
+      - scripts/raw_data_processing.py
+      - data/raw
+    outs:
+      - data/processed/reviews.csv
+
+  split:
+    cmd: python scripts/split_processed_data.py ./data/processed/reviews.csv ./data/splitted ${split.test_size} ${split.stratify}
+    deps:
+      - scripts/split_processed_data.py
+      - ./data/processed/reviews.csv
+    outs:
+      - ./data/splitted/X_train.csv
+      - ./data/splitted/y_train.csv
+      - ./data/splitted/X_test.csv
+      - ./data/splitted/y_test.csv
+
+  train:
+    cmd: python scripts/dummy_model.py ./data/splitted ./params.yaml ./metrics.json
+    deps:
+      - scripts/dummy_model.py
+      - ./data/splitted/X_train.csv
+      - ./data/splitted/y_train.csv
+      - ./data/splitted/X_test.csv
+      - ./data/splitted/y_test.csv
+      - params.yaml
+    metrics:
+      - metrics.json
