@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.10.2
+    container_name: mlflow_server
+    ports:
+      - "5000:5000"
+    environment:
+      - MLFLOW_BACKEND_STORE_URI=sqlite:///mlflow.db
+      - MLFLOW_ARTIFACT_ROOT=/mlflow/artifacts
+      - USER_ID=$(shell id -u)
+      - GROUP_ID=$(shell id -g)
+    volumes:
+      - .:/app 
+      - ./mlflow:/mlflow
+    entrypoint: >
+      sh -c "
+      chmod -R 777 app/mlflow;
+      mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri sqlite:///mlflow.db --default-artifact-root /mlflow/artifacts
+      "
+    command: mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri sqlite:///mlflow.db --default-artifact-root /mlflow/artifacts --serve-artifacts
+    networks:
+      - summer-25-lab3-6-nswierkowski_default 
+
+  training:
+    build: .
+    container_name: model_training
+    depends_on:
+      - mlflow
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - USER_ID=$(shell id -u)
+      - GROUP_ID=$(shell id -g)
+    networks:
+      - summer-25-lab3-6-nswierkowski_default  
+    volumes:
+      - .:/app 
+      - ./mlflow:/mlflow
+    command: dvc repro  
+
+networks:
+  summer-25-lab3-6-nswierkowski_default:
+    external: true
