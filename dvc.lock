@@ -1,0 +1,109 @@
+schema: '2.0'
+stages:
+  raw_data_processing:
+    cmd: python scripts/raw_data_processing.py ./data/raw ./data/processed/reviews.csv
+    deps:
+    - path: data/raw
+      hash: md5
+      md5: ba31c71c138e08c8069131a7d73e784d.dir
+      size: 524018439
+      nfiles: 7
+    - path: scripts/raw_data_processing.py
+      hash: md5
+      md5: a142f895a13e666771377fd2361f3e64
+      size: 1987
+    params:
+      params.yaml:
+        raw_data_processing.colums_not_to_keep:
+        - brand_id
+        - product_id
+    outs:
+    - path: data/processed/reviews.csv
+      hash: md5
+      md5: dc289a4d0b7284f7c95503580ab54637
+      size: 1641292133
+  split:
+    cmd: python scripts/split_processed_data.py ./data/processed/reviews.csv ./data/splitted
+      0.2 true
+    deps:
+    - path: ./data/processed/reviews.csv
+      hash: md5
+      md5: dc289a4d0b7284f7c95503580ab54637
+      size: 1641292133
+    - path: scripts/split_processed_data.py
+      hash: md5
+      md5: a66a264c2ce50410ef11aa71f26ba31f
+      size: 1386
+    outs:
+    - path: ./data/splitted/X_test.csv
+      hash: md5
+      md5: 7f74162c942ba419400995267b6f672e
+      size: 327764944
+    - path: ./data/splitted/X_train.csv
+      hash: md5
+      md5: d5e6578268dce3d6bb798cbedc3007b6
+      size: 1311339010
+    - path: ./data/splitted/y_test.csv
+      hash: md5
+      md5: 095630a672309c349967c9ed1ffcf453
+      size: 437779
+    - path: ./data/splitted/y_train.csv
+      hash: md5
+      md5: fb7c9edfa9f744aaefb61d08998552dd
+      size: 1751069
+  train:
+    cmd: python scripts/dummy_model.py ./data/splitted ./params.yaml ./metrics.json
+    deps:
+    - path: ./data/splitted/X_test.csv
+      hash: md5
+      md5: 7f74162c942ba419400995267b6f672e
+      size: 327764944
+    - path: ./data/splitted/X_train.csv
+      hash: md5
+      md5: d5e6578268dce3d6bb798cbedc3007b6
+      size: 1311339010
+    - path: ./data/splitted/y_test.csv
+      hash: md5
+      md5: 095630a672309c349967c9ed1ffcf453
+      size: 437779
+    - path: ./data/splitted/y_train.csv
+      hash: md5
+      md5: fb7c9edfa9f744aaefb61d08998552dd
+      size: 1751069
+    - path: params.yaml
+      hash: md5
+      md5: 3fa2a4fd80671db3a3e25750186bdd44
+      size: 204
+    - path: scripts/dummy_model.py
+      hash: md5
+      md5: e19b24e2dfd78ccbb6a6f8be8d5bd47a
+      size: 3135
+    outs:
+    - path: data/mlflow/conf_matrix_Test.png
+      hash: md5
+      md5: 301245b7341e0b16c7c01134c0703d88
+      size: 24564
+    - path: data/mlflow/conf_matrix_Train.png
+      hash: md5
+      md5: 3a3f6981e25aafd1de72bad8bbbdba6a
+      size: 23154
+    - path: metrics.json
+      hash: md5
+      md5: bc65997bb00a029279f8f20ed86c8d6e
+      size: 44
+  execute_notebook:
+    cmd: papermill notebooks/exploratory_analysis.ipynb data/processed/exploratory_analysis.ipynb
+    deps:
+    - path: data/processed/reviews.csv
+      hash: md5
+      md5: dc289a4d0b7284f7c95503580ab54637
+      size: 1641292133
+    - path: notebooks/exploratory_analysis.ipynb
+      hash: md5
+      md5: 8a45d5ab6298b52b23834d553b34cf3b
+      size: 13646
+    outs:
+    - path: data/processed/exploratory_analysis.ipynb
+      hash: md5
+      md5: d412570dcde23cc66a89afb03fe6cd40
+      size: 646436

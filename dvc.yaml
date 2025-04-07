@@ -1,11 +1,22 @@
 stages:
   raw_data_processing:
-    cmd: python scripts/raw_data_processing.py ./data/raw ./data/processed/reviews.csv
+    cmd: python scripts/raw_data_processing.py ./data/raw ./data/processed/reviews.csv 
+    params:
+      - raw_data_processing.colums_not_to_keep
     deps:
       - scripts/raw_data_processing.py
       - data/raw
     outs:
       - data/processed/reviews.csv
+
+  execute_notebook:
+    cmd: papermill notebooks/exploratory_analysis.ipynb data/processed/exploratory_analysis.ipynb
+    deps:
+      - notebooks/exploratory_analysis.ipynb
+      - data/processed/reviews.csv
+    outs:
+      - data/processed/exploratory_analysis.ipynb:
+          cache: false
 
   split:
     cmd: python scripts/split_processed_data.py ./data/processed/reviews.csv ./data/splitted ${split.test_size} ${split.stratify}
@@ -29,3 +40,6 @@ stages:
       - params.yaml
     metrics:
       - metrics.json
+    outs:
+      - data/mlflow/conf_matrix_Train.png
+      - data/mlflow/conf_matrix_Test.png

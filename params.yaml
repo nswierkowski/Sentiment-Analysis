@@ -1,6 +1,15 @@
+raw_data_processing:
+  colums_not_to_keep:
+  - brand_id
+  - product_id
+
+execute_notebook:
+  data_path: data/processed/reviews.csv
+
 split:
   test_size: 0.2
   stratify: true
 
 train:
-  model: uniform
+  model: most_frequent
+
