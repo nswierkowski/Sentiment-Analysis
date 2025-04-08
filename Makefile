@@ -33,8 +33,8 @@ SPLIT_DATA_DIR=$(DATA_DIR)/split
 # dvc_status:
 # 	docker run -it --rm -v $(shell pwd):/app pdiow-python dvc status
 
-# mlflow_up:
-# 	docker compose up -d
+mlflow_up:
+	docker compose up -d && docker logs -f model_training
 
 # mlflow_down:
 # 	docker compose down

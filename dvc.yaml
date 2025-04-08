@@ -29,17 +29,39 @@ stages:
       - ./data/splitted/X_test.csv
       - ./data/splitted/y_test.csv
 
-  train:
-    cmd: python scripts/dummy_model.py ./data/splitted ./params.yaml ./metrics.json
+  clean_data:
+    cmd: python3 scripts/clean_data.py ./data/splitted ./data/cleaned ./params.yaml
     deps:
-      - scripts/dummy_model.py
+      - scripts/clean_data.py
       - ./data/splitted/X_train.csv
       - ./data/splitted/y_train.csv
       - ./data/splitted/X_test.csv
       - ./data/splitted/y_test.csv
       - params.yaml
+    outs:
+      - data/cleaned/X_train_cleaned.csv
+      - data/cleaned/y_train_cleaned.csv
+      - data/cleaned/X_test_cleaned.csv
+      - data/cleaned/y_test_cleaned.csv
+
+  validate:
+    cmd: python3 scripts/validate.py ./data/cleaned ./data/validate ./params.yaml
+    deps:
+      - scripts/validate.py
+      - data/cleaned/X_train_cleaned.csv
+      - data/cleaned/y_train_cleaned.csv
+      - data/cleaned/X_test_cleaned.csv
+      - data/cleaned/y_test_cleaned.csv
+      - params.yaml
+    outs:
+      - data/validate/cv_metrics_all_modes.csv
+
+  train:
+    cmd: python scripts/train.py ./data/cleaned ./data/validate/cv_metrics_all_modes.csv ./params.yaml ./metrics.json
+    deps:
+      - scripts/train.py
+      - data/cleaned/X_test_cleaned.csv
+      - data/cleaned/y_test_cleaned.csv
+      - params.yaml
     metrics:
       - metrics.json
-    outs:
-      - data/mlflow/conf_matrix_Train.png
-      - data/mlflow/conf_matrix_Test.png

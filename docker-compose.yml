@@ -37,7 +37,7 @@ services:
     volumes:
       - .:/app 
       - ./mlflow:/mlflow
-    command: dvc repro  
+    command: dvc repro 
 
 networks:
   summer-25-lab3-6-nswierkowski_default:
