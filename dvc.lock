@@ -10,8 +10,8 @@ stages:
       nfiles: 7
     - path: scripts/raw_data_processing.py
       hash: md5
-      md5: a142f895a13e666771377fd2361f3e64
-      size: 1987
+      md5: e26d5d5558d7a386486915d3e9cb908c
+      size: 2000
     params:
       params.yaml:
         raw_data_processing.colums_not_to_keep:
@@ -20,16 +20,16 @@ stages:
     outs:
     - path: data/processed/reviews.csv
       hash: md5
-      md5: dc289a4d0b7284f7c95503580ab54637
-      size: 1641292133
+      md5: 5653b587199de010bebfaee5d26d5cbc
+      size: 1633647954
   split:
     cmd: python scripts/split_processed_data.py ./data/processed/reviews.csv ./data/splitted
       0.2 true
     deps:
     - path: ./data/processed/reviews.csv
       hash: md5
-      md5: dc289a4d0b7284f7c95503580ab54637
-      size: 1641292133
+      md5: 5653b587199de010bebfaee5d26d5cbc
+      size: 1633647954
     - path: scripts/split_processed_data.py
       hash: md5
       md5: a66a264c2ce50410ef11aa71f26ba31f
@@ -37,67 +37,52 @@ stages:
     outs:
     - path: ./data/splitted/X_test.csv
       hash: md5
-      md5: 7f74162c942ba419400995267b6f672e
-      size: 327764944
+      md5: a92a97bfed518cf07180d0ee46e99345
+      size: 326045223
     - path: ./data/splitted/X_train.csv
       hash: md5
-      md5: d5e6578268dce3d6bb798cbedc3007b6
-      size: 1311339010
+      md5: acd2ed538dd7fdff4dc59ffa0a12be8f
+      size: 1305414527
     - path: ./data/splitted/y_test.csv
       hash: md5
-      md5: 095630a672309c349967c9ed1ffcf453
+      md5: ecc95312054fcc4b1bfce99f0316c458
       size: 437779
     - path: ./data/splitted/y_train.csv
       hash: md5
-      md5: fb7c9edfa9f744aaefb61d08998552dd
+      md5: d16dd205c840347f27c8d5d6af012be7
       size: 1751069
   train:
-    cmd: python scripts/dummy_model.py ./data/splitted ./params.yaml ./metrics.json
+    cmd: python scripts/train.py ./data/cleaned ./data/validate/cv_metrics_all_modes.csv
+      ./params.yaml ./metrics.json
     deps:
-    - path: ./data/splitted/X_test.csv
+    - path: data/cleaned/X_test_cleaned.csv
       hash: md5
-      md5: 7f74162c942ba419400995267b6f672e
-      size: 327764944
-    - path: ./data/splitted/X_train.csv
+      md5: c4a22f67b3a31aedf3acaa9397436e00
+      size: 1312857
+    - path: data/cleaned/y_test_cleaned.csv
       hash: md5
-      md5: d5e6578268dce3d6bb798cbedc3007b6
-      size: 1311339010
-    - path: ./data/splitted/y_test.csv
-      hash: md5
-      md5: 095630a672309c349967c9ed1ffcf453
-      size: 437779
-    - path: ./data/splitted/y_train.csv
-      hash: md5
-      md5: fb7c9edfa9f744aaefb61d08998552dd
-      size: 1751069
+      md5: 3723b765014835d3b3eebead7d5eb5ac
+      size: 2013
     - path: params.yaml
       hash: md5
-      md5: 3fa2a4fd80671db3a3e25750186bdd44
-      size: 204
-    - path: scripts/dummy_model.py
+      md5: 84d29b82722055f585e0a2932c3a69bc
+      size: 301
+    - path: scripts/train.py
       hash: md5
-      md5: e19b24e2dfd78ccbb6a6f8be8d5bd47a
-      size: 3135
+      md5: 764252cf975fbfa45292333b3ed9d037
+      size: 6292
     outs:
-    - path: data/mlflow/conf_matrix_Test.png
-      hash: md5
-      md5: 301245b7341e0b16c7c01134c0703d88
-      size: 24564
-    - path: data/mlflow/conf_matrix_Train.png
-      hash: md5
-      md5: 3a3f6981e25aafd1de72bad8bbbdba6a
-      size: 23154
     - path: metrics.json
       hash: md5
-      md5: bc65997bb00a029279f8f20ed86c8d6e
-      size: 44
+      md5: 88c6f45566d9c7ebea3771ab42d43da9
+      size: 951
   execute_notebook:
     cmd: papermill notebooks/exploratory_analysis.ipynb data/processed/exploratory_analysis.ipynb
     deps:
     - path: data/processed/reviews.csv
       hash: md5
-      md5: dc289a4d0b7284f7c95503580ab54637
-      size: 1641292133
+      md5: 5653b587199de010bebfaee5d26d5cbc
+      size: 1633647954
     - path: notebooks/exploratory_analysis.ipynb
       hash: md5
       md5: 8a45d5ab6298b52b23834d553b34cf3b
@@ -105,5 +90,81 @@ stages:
     outs:
     - path: data/processed/exploratory_analysis.ipynb
       hash: md5
-      md5: d412570dcde23cc66a89afb03fe6cd40
-      size: 646436
+      md5: cda9915c962e1ed8beab55a50e747d39
+      size: 641241
+  clean_data:
+    cmd: python3 scripts/clean_data.py ./data/splitted ./data/cleaned ./params.yaml
+    deps:
+    - path: ./data/splitted/X_test.csv
+      hash: md5
+      md5: a92a97bfed518cf07180d0ee46e99345
+      size: 326045223
+    - path: ./data/splitted/X_train.csv
+      hash: md5
+      md5: acd2ed538dd7fdff4dc59ffa0a12be8f
+      size: 1305414527
+    - path: ./data/splitted/y_test.csv
+      hash: md5
+      md5: ecc95312054fcc4b1bfce99f0316c458
+      size: 437779
+    - path: ./data/splitted/y_train.csv
+      hash: md5
+      md5: d16dd205c840347f27c8d5d6af012be7
+      size: 1751069
+    - path: params.yaml
+      hash: md5
+      md5: 84d29b82722055f585e0a2932c3a69bc
+      size: 301
+    - path: scripts/clean_data.py
+      hash: md5
+      md5: e5754e0772043dc2c4b45f5b1afc8b62
+      size: 3231
+    outs:
+    - path: data/cleaned/X_test_cleaned.csv
+      hash: md5
+      md5: c4a22f67b3a31aedf3acaa9397436e00
+      size: 1312857
+    - path: data/cleaned/X_train_cleaned.csv
+      hash: md5
+      md5: 395d4738e608d6f8ed042163527b7462
+      size: 1340976
+    - path: data/cleaned/y_test_cleaned.csv
+      hash: md5
+      md5: 3723b765014835d3b3eebead7d5eb5ac
+      size: 2013
+    - path: data/cleaned/y_train_cleaned.csv
+      hash: md5
+      md5: 158f05b50298b352b55a7dec21f0eb9e
+      size: 2013
+  validate:
+    cmd: python3 scripts/validate.py ./data/cleaned ./data/validate ./params.yaml
+    deps:
+    - path: data/cleaned/X_test_cleaned.csv
+      hash: md5
+      md5: c4a22f67b3a31aedf3acaa9397436e00
+      size: 1312857
+    - path: data/cleaned/X_train_cleaned.csv
+      hash: md5
+      md5: 395d4738e608d6f8ed042163527b7462
+      size: 1340976
+    - path: data/cleaned/y_test_cleaned.csv
+      hash: md5
+      md5: 3723b765014835d3b3eebead7d5eb5ac
+      size: 2013
+    - path: data/cleaned/y_train_cleaned.csv
+      hash: md5
+      md5: 158f05b50298b352b55a7dec21f0eb9e
+      size: 2013
+    - path: params.yaml
+      hash: md5
+      md5: 84d29b82722055f585e0a2932c3a69bc
+      size: 301
+    - path: scripts/validate.py
+      hash: md5
+      md5: d65ef78fa376e64babb0c528ca37bf13
+      size: 3253
+    outs:
+    - path: data/validate/cv_metrics_all_modes.csv
+      hash: md5
+      md5: c92b339a644af935089254741da28259
+      size: 3693

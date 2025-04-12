@@ -40,7 +40,7 @@ def handle_existing_columns(df: pd.DataFrame, columns_not_to_keep: List[str]) ->
     
 def preprocess_and_save(path_to_raw_data, path_to_processed_data, columns_not_to_keep) -> None:
     handle_existing_columns(join_products_and_reviews(path_to_raw_data), columns_not_to_keep)\
-        .to_csv(path_to_processed_data)
+        .to_csv(path_to_processed_data, index=False)
 
 if __name__=='__main__':
     path_to_raw_data = sys.argv[1]
