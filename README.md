@@ -10,7 +10,7 @@ The project compares classical machine learning models and evaluates their expla
 
 ---
 
-## 🚀 How to Run the Project
+## How to Run the Project
 
 ### 1. Prepare Data Directory Structure
 
